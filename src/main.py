@@ -44,20 +44,13 @@ following_names = [user.name for user in following] # List of name strings
 print(following_names, end="   ")
 print(len(following_names))
 
+# Working but following_names not full because of pagination
 least_liked_friends = [user for user in following_names 
                        if user not in likes_by_user.keys()
                        or likes_by_user[user] < 2]
 
-# least_liked_friends = []
-# for user in following_names:
-#   if user not in likes_by_user.keys():
-#     least_liked_friends.append(user)
-#   elif likes_by_user[user] < 2:
-#     least_liked_friends.append(user)
-#   print(likes_by_user[user])
 
 print(least_liked_friends)
-
 
 def manage_friends_insomeway():
   pass

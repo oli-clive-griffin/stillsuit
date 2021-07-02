@@ -1,6 +1,17 @@
+import pprint
 import tweepy as tw
 from dotenv import load_dotenv
 import os 
+from collections import Counter
+
+from test_data import likes_by_user 
+
+
+
+#--------
+#--------
+
+
 
 
 load_dotenv()
@@ -15,16 +26,26 @@ auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 
 api = tw.API(auth)
 
+#-----------
+#-----------
 
-print(api.rate_limit_status())
 
 me = api.me()
-
 friends = api.friends(me.name)
-
 latest_follow = friends[0]
 
-# api.destroy_friendship(latest_follow.id)
+# Get liked tweets    (: Tweet)
+# liked_tweets = [item for item in tw.Cursor(api.favorites, name=me.name).items(1000)]
 
-print(latest_follow.id)
-print(me.id)
+# Extract usernames
+# liked_accounts  = [tweet.user for tweet in liked_tweets]
+
+# Count combine with above - nested comprehension?
+# likes_by_user = Counter([user.name for user in liked_accounts])
+
+# pp = pprint.PrettyPrinter(indent=4)
+# pp.pprint(likes_by_user)
+
+# print(likes_by_user)
+
+print(len(likes_by_user))

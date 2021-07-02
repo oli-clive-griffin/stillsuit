@@ -3,18 +3,15 @@ import tweepy as tw
 from dotenv import load_dotenv
 import os 
 from collections import Counter
+from analysis import show_distribution_likes
 
+# use test_data for dev when possible to limit API requests
 from test_data import likes_by_user 
 
 
-
-#--------
-#--------
-
-
-
-
 load_dotenv()
+pp = pprint.PrettyPrinter(indent=4)
+
 
 CONSUMER_KEY = os.environ.get("API_KEY")
 CONSUMER_SECRET = os.environ.get("API_SECRET_KEY")
@@ -26,13 +23,7 @@ auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 
 api = tw.API(auth)
 
-#-----------
-#-----------
-
-
 me = api.me()
-friends = api.friends(me.name)
-latest_follow = friends[0]
 
 # Get liked tweets    (: Tweet)
 # liked_tweets = [item for item in tw.Cursor(api.favorites, name=me.name).items(1000)]
@@ -43,9 +34,30 @@ latest_follow = friends[0]
 # Count combine with above - nested comprehension?
 # likes_by_user = Counter([user.name for user in liked_accounts])
 
-# pp = pprint.PrettyPrinter(indent=4)
-# pp.pprint(likes_by_user)
+# Get list of users whose tweets you've liked
+liked_users = likes_by_user.keys()
 
-# print(likes_by_user)
+# Get friends
+following = [user for user in tw.Cursor(api.friends, name=me.name).items()] # list of friends
+following_names = [user.name for user in following] # List of name strings
 
-print(len(likes_by_user))
+print(following_names, end="   ")
+print(len(following_names))
+
+least_liked_friends = [user for user in following_names 
+                       if user not in likes_by_user.keys()
+                       or likes_by_user[user] < 2]
+
+# least_liked_friends = []
+# for user in following_names:
+#   if user not in likes_by_user.keys():
+#     least_liked_friends.append(user)
+#   elif likes_by_user[user] < 2:
+#     least_liked_friends.append(user)
+#   print(likes_by_user[user])
+
+print(least_liked_friends)
+
+
+def manage_friends_insomeway():
+  pass

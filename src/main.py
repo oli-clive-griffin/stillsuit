@@ -1,4 +1,6 @@
 import pprint
+from time import sleep
+from requests.sessions import get_netrc_auth
 import tweepy as tw
 from dotenv import load_dotenv
 import os 
@@ -6,7 +8,7 @@ from collections import Counter
 from analysis import show_distribution_likes
 
 # use test_data for dev when possible to limit API requests
-from test_data import likes_by_user 
+from test_data import likes_by_user_test, following_names_test
 
 
 load_dotenv()
@@ -20,37 +22,44 @@ ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
 
 auth = tw.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-
 api = tw.API(auth)
-
 me = api.me()
 
-# Get liked tweets    (: Tweet)
-# liked_tweets = [item for item in tw.Cursor(api.favorites, name=me.name).items(1000)]
 
-# Extract usernames
-# liked_accounts  = [tweet.user for tweet in liked_tweets]
+def get_likes_by_user(me_name):
+  # Get liked tweets
+  liked_tweets = [item for item in tw.Cursor(api.favorites, name=me_name).items(20)]
+  # Extract usernames
+  liked_users  = [tweet.user for tweet in liked_tweets]
+  # make counter dict
+  likes_by_user = Counter([user.name for user in liked_users])
+  return likes_by_user
 
-# Count combine with above - nested comprehension?
-# likes_by_user = Counter([user.name for user in liked_accounts])
 
-# Get list of users whose tweets you've liked
-liked_users = likes_by_user.keys()
+def get_following(me_name):
+  following = []
+  print('getting users you are following (friends) ...')
+  for user in tw.Cursor(api.friends, name=me_name).items():
+    print(user.name)
+    following.append(user)
+    sleep(2)
+  following_names = [user.name for user in following] # List of name strings
+  return following_names
 
-# Get friends
-following = [user for user in tw.Cursor(api.friends, name=me.name).items()] # list of friends
-following_names = [user.name for user in following] # List of name strings
 
-print(following_names, end="   ")
-print(len(following_names))
+def get_least_liked_friends(following_names):
+  least_liked_friends = [user for user in following_names 
+                         if user not in likes_by_user.keys()
+                         or likes_by_user[user] < 2]
+  return least_liked_friends
 
-# Working but following_names not full because of pagination
-least_liked_friends = [user for user in following_names 
-                       if user not in likes_by_user.keys()
-                       or likes_by_user[user] < 2]
 
+# likes_by_user = get_likes_by_user(me.name)
+likes_by_user = likes_by_user_test
+
+# following_names = get_following(me)
+following_names = following_names_test
+
+least_liked_friends = get_least_liked_friends(following_names)
 
 print(least_liked_friends)
-
-def manage_friends_insomeway():
-  pass

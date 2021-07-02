@@ -47,7 +47,7 @@ def get_following(me_name):
   return following_names
 
 
-def get_least_liked_friends(following_names):
+def get_least_liked_friends(following_names, likes_by_user):
   least_liked_friends = [user for user in following_names 
                          if user not in likes_by_user.keys()
                          or likes_by_user[user] < 2]
@@ -57,9 +57,9 @@ def get_least_liked_friends(following_names):
 # likes_by_user = get_likes_by_user(me.name)
 likes_by_user = likes_by_user_test
 
-# following_names = get_following(me)
+# following_names = get_following(me.name)
 following_names = following_names_test
 
-least_liked_friends = get_least_liked_friends(following_names)
+least_liked_friends = get_least_liked_friends(following_names, likes_by_user)
 
-print(least_liked_friends)
+print(f"Users you might want to unfollow: \n{least_liked_friends}")

@@ -23,6 +23,7 @@ ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
 auth = tw.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 api = tw.API(auth)
+
 me = api.me()
 
 
@@ -48,9 +49,7 @@ def get_following(me_name):
 
 
 def get_least_liked_friends(following_names, likes_by_user):
-  least_liked_friends = [user for user in following_names 
-                         if user not in likes_by_user.keys()
-                         or likes_by_user[user] < 2]
+  least_liked_friends = list(filter((lambda user: user not in likes_by_user.keys() or likes_by_user[user] < 2), following_names))
   return least_liked_friends
 
 
@@ -63,3 +62,10 @@ following_names = following_names_test
 least_liked_friends = get_least_liked_friends(following_names, likes_by_user)
 
 print(f"Users you might want to unfollow: \n{least_liked_friends}")
+
+
+
+
+
+
+
